@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XS-SHAUNATA — War vs NhatNguyet Player Ratings</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold:#c9a84c; --gold-light:#f0d080; --gold-dark:#8a6a1f;
+    --red:#c0392b; --blue:#2980b9; --bg:#0a0a0f;
+    --card:#111118; --card2:#16161f; --text:#d4d4e8;
+    --dim:#888899; --border:#2a2a3a; --green:#27ae60;
+    --orange:#e67e22; --purple:#8e44ad; --white:#ffffff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:16px;line-height:1.6;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 15%,rgba(201,168,76,.06) 0%,transparent 50%),radial-gradient(ellipse at 85% 85%,rgba(41,128,185,.06) 0%,transparent 50%);pointer-events:none;z-index:0;}
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 20px 80px;position:relative;z-index:1;}
+  .header{text-align:center;padding:50px 0 30px;}
+  .guild-tag{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-bottom:10px;opacity:.8;}
+  .main-title{font-family:'Cinzel Decorative',serif;font-size:clamp(24px,5vw,42px);font-weight:900;color:var(--white);text-shadow:0 0 40px rgba(201,168,76,.3);line-height:1.2;margin-bottom:8px;}
+  .subtitle{color:var(--dim);font-size:13px;letter-spacing:3px;}
+  .divider{width:180px;height:2px;margin:20px auto;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+  .summary-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--gold-dark);border:1px solid var(--gold-dark);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+  .summary-item{background:linear-gradient(135deg,#1a1a10,#111118);padding:16px 10px;text-align:center;}
+  .summary-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:4px;}
+  .summary-value{font-family:'Cinzel Decorative',serif;font-size:22px;color:var(--gold);}
+  .summary-value.win{color:var(--green);}
+  .war-note{background:linear-gradient(135deg,#1a1000,#12100a);border:1px solid var(--orange);border-radius:8px;padding:12px 18px;margin-bottom:28px;font-size:13px;color:var(--orange);text-align:center;font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
+  .sub-badge{display:inline-block;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.4);color:#a78bfa;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;padding:2px 7px;border-radius:3px;margin-left:8px;vertical-align:middle;}
+  .group-block{margin:30px 0 12px;}
+  .group-header{display:flex;align-items:center;gap:14px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;border-left-width:4px;border-left-style:solid;}
+  .group-name{font-family:'Cinzel Decorative',serif;font-size:15px;color:var(--gold);}
+  .group-desc{font-size:12px;color:var(--dim);}
+  .player-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;border-left-width:4px;border-left-style:solid;transition:transform .2s,border-color .2s;}
+  .player-card:hover{transform:translateX(4px);}
+  .card-header{display:flex;align-items:center;justify-content:space-between;background:var(--card2);padding:14px 18px 10px;}
+  .player-name{font-size:18px;font-weight:700;color:var(--white);}
+  .player-role{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);margin-top:2px;}
+  .score-badge{font-family:'Cinzel Decorative',serif;font-size:28px;font-weight:900;min-width:70px;text-align:right;}
+  .mvp-banner{background:linear-gradient(135deg,#1a1500,#1a1200);border-top:1px solid var(--gold-dark);border-bottom:1px solid var(--gold-dark);text-align:center;padding:5px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;}
+  .card-summary{padding:10px 18px;font-size:13px;color:var(--dim);border-bottom:1px solid var(--border);line-height:1.5;}
+  .stats-row{display:grid;grid-template-columns:repeat(6,1fr);background:#0e0e18;border-bottom:1px solid var(--border);}
+  .stat-cell{padding:8px 6px;text-align:center;border-right:1px solid var(--border);}
+  .stat-cell:last-child{border-right:none;}
+  .stat-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--dim);margin-bottom:3px;}
+  .stat-value{font-size:13px;font-weight:700;color:var(--gold-light);}
+  .d0{color:var(--green);} .d1{color:#a3e635;} .d2{color:var(--orange);} .d3{color:#f97316;} .d4,.d5,.d6{color:var(--red);}
+  .card-bottom{display:grid;grid-template-columns:1fr 1fr;}
+  .si-col{padding:10px 16px;}
+  .si-col:first-child{border-right:1px solid var(--border);}
+  .si-title{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;margin-bottom:6px;font-weight:700;}
+  .si-title.s{color:var(--green);} .si-title.i{color:var(--orange);}
+  .si-item{font-size:12px;color:var(--text);margin-bottom:4px;line-height:1.4;}
+  .si-item.s::before{content:'+';color:var(--green);margin-right:6px;font-weight:700;}
+  .si-item.i::before{content:'-';color:var(--orange);margin-right:6px;font-weight:700;}
+  .score-s{color:#2ecc71;} .score-a{color:var(--gold);} .score-b{color:var(--orange);} .score-c{color:var(--red);}
+  .acc-tank{border-left-color:var(--blue);} .acc-healer{border-left-color:var(--green);} .acc-dps{border-left-color:var(--red);}
+  .g1{border-left-color:var(--blue);} .g2{border-left-color:var(--red);} .g3{border-left-color:var(--gold);}
+  .g4{border-left-color:var(--orange);} .g5{border-left-color:var(--green);} .g6{border-left-color:var(--purple);}
+  .footer{text-align:center;margin-top:50px;padding-top:24px;border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:1px;line-height:1.8;}
+  @media(max-width:600px){.summary-bar{grid-template-columns:repeat(3,1fr);}.stats-row{grid-template-columns:repeat(3,1fr);}.card-bottom{grid-template-columns:1fr;}.si-col:first-child{border-right:none;border-bottom:1px solid var(--border);}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="guild-tag">Individual Player Performance Ratings · War vs NhatNguyet</div>
+    <h1 class="main-title">XS-SHAUNATA</h1>
+    <p class="subtitle">WAR VS NHATNGUYET — PLAYER RATINGS REPORT</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="summary-bar">
+    <div class="summary-item"><div class="summary-label">Total Kills</div><div class="summary-value">212</div></div>
+    <div class="summary-item"><div class="summary-label">Total Damage</div><div class="summary-value">86.3M</div></div>
+    <div class="summary-item"><div class="summary-label">Total Healing</div><div class="summary-value">65.2M</div></div>
+    <div class="summary-item"><div class="summary-label">Siege Damage</div><div class="summary-value">13.0M</div></div>
+    <div class="summary-item"><div class="summary-label">Result</div><div class="summary-value win">WIN</div></div>
+  </div>
+
+  <div class="war-note">⚠ HARDER WAR — Damage, healing &amp; assists are 2–3× higher than vs China guild. Numbers reflect a longer, more contested match.</div>
+
+  <!-- G1 -->
+  <div class="group-block"><div class="group-header g1"><div><div class="group-name">G1 — MAIN DEFENSE</div><div class="group-desc">MeToloLong · kyouskie · Zaystro (sub for EnokiSan) · Zellania · KindaSavage</div></div></div></div>
+
+  <!-- kyouskie -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">kyouskie</div><div class="player-role">DISRUPT DPS · G1 MAIN DEFENSE</div></div><div class="score-badge score-s">9.8</div></div>
+    <div class="mvp-banner">★  #1 DAMAGE IN THE ENTIRE WAR — 9,782,118  ★</div>
+    <div class="card-summary">G1 Disrupt DPS. An absolutely extraordinary performance — 9.78M damage is the highest in the entire war by a massive margin. 17 kills with only 1 death. The standout individual player of this war without question.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">17</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">58</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">9,782,118</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">—</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">9.78M damage — #1 in the entire war, nearly double 2nd place</div>
+        <div class="si-item s">17 kills — tied for most in the war</div>
+        <div class="si-item s">Only 1 death — elite survivability under heavy pressure</div>
+        <div class="si-item s">58 assists — consistent team presence throughout</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">Nothing meaningful to flag — this is an MVP-tier performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MeToloLong -->
+  <div class="player-card acc-tank">
+    <div class="card-header"><div><div class="player-name">MeToloLong</div><div class="player-role">ANCHOR TANK · G1 MAIN DEFENSE</div></div><div class="score-badge score-s">9.3</div></div>
+    <div class="card-summary">G1 Anchor Tank. 5.79M damage from a tank is exceptional — one of the highest damage outputs among all tanks in the war. 2 deaths is acceptable given the intensity of this match.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">11</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d2">2</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">62</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">5,786,502</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">—</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">5.79M damage — extraordinary output for an anchor tank</div>
+        <div class="si-item s">11 kills from a tank role is elite</div>
+        <div class="si-item s">62 assists — among the highest in G1</div>
+        <div class="si-item s">2.98M damage taken — properly anchoring the frontline</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">2 deaths — review those instances, even in a hard war this should be 0-1 for a defense anchor</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zaystro -->
+  <div class="player-card acc-tank">
+    <div class="card-header"><div><div class="player-name">Zaystro <span class="sub-badge">SUB</span></div><div class="player-role">ANCHOR TANK · G1 MAIN DEFENSE · SUBBED IN FOR EnokiSan</div></div><div class="score-badge score-a">8.4</div></div>
+    <div class="card-summary">G1 Anchor Tank sub. 5.29M damage and 11 kills is a strong showing from a substitute player stepping into the defense anchor role. 4 deaths is the concern in what was already a high-pressure war.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">11</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d4">4</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">59</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">5,287,750</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">28,648</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">5.29M damage — excellent output for a sub tank</div>
+        <div class="si-item s">11 kills — stepped up offensively</div>
+        <div class="si-item s">59 assists — fully integrated into team fights</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">4 deaths is too high for a defense anchor — survivability must improve</div>
+        <div class="si-item i">Positioning review needed — dying 4 times disrupts the defensive line</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zellania -->
+  <div class="player-card acc-healer">
+    <div class="card-header"><div><div class="player-name">Zellania</div><div class="player-role">MAIN HEALER · G1 MAIN DEFENSE</div></div><div class="score-badge score-s">9.2</div></div>
+    <div class="card-summary">G1 Main Healer. 9.74M healing with only 1 death in a contested war is an outstanding performance. Also contributed 2.27M damage and 6 kills — showing excellent situational awareness beyond just healing.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">6</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">41</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,270,589</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">9,737,089</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">—</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">9.74M healing — elite output keeping G1 alive all match</div>
+        <div class="si-item s">Only 1 death — excellent self-preservation</div>
+        <div class="si-item s">6 kills and 2.27M damage as a healer is remarkable</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">41 assists is slightly low — but expected given the healing focus in a hard war</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KindaSavage -->
+  <div class="player-card acc-tank">
+    <div class="card-header"><div><div class="player-name">KindaSavage</div><div class="player-role">ANCHOR TANK · G1 MAIN DEFENSE</div></div><div class="score-badge score-a">8.0</div></div>
+    <div class="card-summary">G1 Anchor Tank. A mixed performance — 3.35M damage and 78 assists shows strong engagement, but 4 deaths is a concern. The high assist count suggests presence in fights but survivability needs work.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">4</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d4">4</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">78</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">3,351,217</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">—</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">78 assists — exceptional team presence, was in every fight</div>
+        <div class="si-item s">3.35M damage — strong improvement over last war</div>
+        <div class="si-item s">3.39M damage taken — fully committing to the frontline</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">4 deaths — same issue as last war, positioning must be addressed</div>
+        <div class="si-item i">High assists but low kills — convert more of those engagements</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- G2 -->
+  <div class="group-block"><div class="group-header g2"><div><div class="group-name">G2 — MAIN DEFENSE</div><div class="group-desc">Dovlyn (sub for Immemorian) · XenneX · Pilosofoo · Brilliant · Anello (Healer)</div></div></div></div>
+
+  <!-- Dovlyn -->
+  <div class="player-card acc-tank">
+    <div class="card-header"><div><div class="player-name">Dovlyn <span class="sub-badge">SUB</span></div><div class="player-role">ANCHOR TANK · G2 MAIN DEFENSE · SUBBED IN FOR Immemorian</div></div><div class="score-badge score-s">9.1</div></div>
+    <div class="card-summary">G2 Anchor Tank sub. Stepped into a group that previously had immemorian's elite fragging and held the line effectively. 5.06M damage with only 1 death is a very strong sub performance.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">7</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">68</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">5,063,509</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">—</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">5.06M damage — excellent output for a sub tank</div>
+        <div class="si-item s">Only 1 death — elite survivability</div>
+        <div class="si-item s">68 assists — fully integrated into G2 fights immediately</div>
+        <div class="si-item s">2.68M damage taken — proper frontline presence</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">7 kills is decent but immemorian set a very high bar (17) in the previous war</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- XenneX -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">XenneX</div><div class="player-role">DISRUPT DPS · G2 MAIN DEFENSE</div></div><div class="score-badge score-b">7.2</div></div>
+    <div class="card-summary">G2 Disrupt DPS. 5.21M damage is strong but 4 deaths on a defense group is a significant problem — especially compared to the 0-death showing in the last war. The harder opponent clearly exposed some survivability issues.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">2</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d4">4</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">66</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">5,208,203</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">—</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">5.21M damage — strong output showing engagement</div>
+        <div class="si-item s">66 assists — consistently present in team fights</div>
+        <div class="si-item s">3.70M damage taken — absorbing pressure for the team</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">4 deaths — went from 0 deaths vs China to 4 here, needs major positioning review</div>
+        <div class="si-item i">Only 2 kills despite high damage — kill conversion is very low</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pilosofoo -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Pilosofoo</div><div class="player-role">AOE DPS · G2 MAIN DEFENSE</div></div><div class="score-badge score-b">7.0</div></div>
+    <div class="card-summary">G2 AoE DPS. 3.14M damage shows contribution but 4 deaths continues the pattern from last war. Pilosofoo now has 2 wars in a row with elevated death counts — this is a consistent issue that needs addressing.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">1</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d4">4</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">48</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">3,143,579</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">—</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">3.14M damage — solid AoE contribution</div>
+        <div class="si-item s">48 assists — present in team fights</div>
+        <div class="si-item s">2.68M damage taken — engaging the frontline</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">4 deaths — 2nd war in a row with high deaths, this is now a pattern that must be addressed</div>
+        <div class="si-item i">Only 1 kill despite 3.14M damage — kill conversion is critically low</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brilliant -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Brilliant</div><div class="player-role">AOE DPS · G2 MAIN DEFENSE</div></div><div class="score-badge score-s">9.4</div></div>
+    <div class="mvp-banner">★  6.38M HEALING AS A DPS — EXTRAORDINARY HYBRID PERFORMANCE  ★</div>
+    <div class="card-summary">G2 AoE DPS. 0 deaths and 6.38M healing as a DPS player is one of the most unique stat lines in either war. Brilliant is essentially functioning as a second healer for G2 while dealing 2.24M damage — invaluable.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">3</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">39</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,239,276</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">6,377,542</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">—</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">6.38M healing as a DPS — extraordinary hybrid contribution</div>
+        <div class="si-item s">0 deaths across both wars — remarkably consistent survivability</div>
+        <div class="si-item s">Essentially functions as a 2nd healer keeping G2 alive</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">39 assists is lower than other G2 members — more team fight engagement needed</div>
+        <div class="si-item i">Damage could be higher if healing workload allows</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anello -->
+  <div class="player-card acc-healer">
+    <div class="card-header"><div><div class="player-name">Anello</div><div class="player-role">MAIN HEALER · G2 MAIN DEFENSE</div></div><div class="score-badge score-b">7.5</div></div>
+    <div class="card-summary">G2 Main Healer. 10.13M healing is a strong output and kept G2 sustained through a difficult war. However 1 death and especially only 5 assists is notably low — healers need to stay connected to their group's fights.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">0</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">5</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">238,252</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">10,127,193</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">—</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">10.13M healing — strong output keeping G2 alive</div>
+        <div class="si-item s">2.81M damage taken shows staying close to the action</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">5 assists is extremely low — lowest in the entire war, suggests disconnect from team fights</div>
+        <div class="si-item i">1 death — healers should be well protected in a defense group</div>
+        <div class="si-item i">Need to stay closer to teammates to both heal and participate in fight assists</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- G3 -->
+  <div class="group-block"><div class="group-header g3"><div><div class="group-name">G3 — PUSH OFFENSE</div><div class="group-desc">Entoma · JerelB (sub for samuraisabi) · Ponoboi · KIRAKxL · Shaunata (Shot Caller)</div></div></div></div>
+
+  <!-- KIRAKxL -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">KIRAKxL</div><div class="player-role">DISRUPT DPS · G3 PUSH OFFENSE</div></div><div class="score-badge score-s">9.6</div></div>
+    <div class="mvp-banner">★  109 ASSISTS — #1 IN THE ENTIRE WAR  ★</div>
+    <div class="card-summary">G3 Disrupt DPS. 109 assists is the highest in the entire war — KIRAKxL was involved in more team fights than any other player. 2 deaths is excellent for a push offense role in a hard war. A dominant disrupt performance.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">8</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d2">2</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">109</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,433,352</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">34,774</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">663,044</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">109 assists — #1 in the entire war, in every single fight</div>
+        <div class="si-item s">Only 2 deaths despite being the most engaged player in the war</div>
+        <div class="si-item s">663K siege damage — maintaining objective focus</div>
+        <div class="si-item s">Consistent improvement from last war</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">Damage output could be higher given the enormous assist count</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entoma -->
+  <div class="player-card acc-tank">
+    <div class="card-header"><div><div class="player-name">Entoma</div><div class="player-role">FLEX TANK · G3 PUSH OFFENSE</div></div><div class="score-badge score-a">8.7</div></div>
+    <div class="mvp-banner">★  107 ASSISTS — TIED #2 IN THE ENTIRE WAR  ★</div>
+    <div class="card-summary">G3 Flex Tank. 107 assists is phenomenal — Entoma continues to be one of the most team-present players in the guild. 3.15M damage from a flex tank in a hard war is excellent. 4 deaths is the main concern.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">6</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d4">4</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">107</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">3,150,297</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">533,947</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">107 assists — tied #2 in the entire war</div>
+        <div class="si-item s">3.15M damage — excellent for a flex tank</div>
+        <div class="si-item s">533K siege damage — objective focused</div>
+        <div class="si-item s">2.15M damage taken — fully committing to the push</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">4 deaths — going up from 2 last war, survivability needs attention</div>
+        <div class="si-item i">High assist count but only 6 kills — could convert more engagements</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ponoboi -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Ponoboi</div><div class="player-role">AOE DPS · G3 PUSH OFFENSE</div></div><div class="score-badge score-a">8.2</div></div>
+    <div class="card-summary">G3 AoE DPS. 11 kills and 2.63M damage is a strong offensive showing. 4 deaths remains a recurring concern — Ponoboi has now had 3 and 4 deaths in back-to-back wars. This pattern needs to be addressed directly.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">11</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d4">4</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">68</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,629,827</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">526,200</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">11 kills — strong offensive output</div>
+        <div class="si-item s">2.63M damage — solid AoE contribution</div>
+        <div class="si-item s">526K siege damage — improved objective focus vs last war</div>
+        <div class="si-item s">68 assists — consistently engaged</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">4 deaths — 3 deaths last war, 4 this war — recurring pattern, must prioritize survival</div>
+        <div class="si-item i">As AoE DPS in push group, dying repeatedly breaks the push momentum</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JerelB -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">JerelB <span class="sub-badge">SUB</span></div><div class="player-role">DPS · G3 PUSH OFFENSE · SUBBED IN FOR samuraisabi</div></div><div class="score-badge score-a">8.0</div></div>
+    <div class="card-summary">G3 DPS sub. 2.05M damage and 77 assists is a solid debut in a push offense group during a hard war. 6 kills shows offensive contribution and 392K siege damage shows objective awareness. 3 deaths is the main area to improve as a DPS in this role.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">6</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d3">3</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">77</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,047,610</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">392,855</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">77 assists — immediately integrated into G3 team fights as a sub</div>
+        <div class="si-item s">392K siege damage — good objective awareness for a DPS</div>
+        <div class="si-item s">2.05M damage taken — fully committed to the push</div>
+        <div class="si-item s">Solid debut performance in a difficult war</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">3 deaths — as a DPS in push offense, survivability needs to improve</div>
+        <div class="si-item i">Damage output could be pushed higher for a push offense DPS role</div>
+        <div class="si-item i">6 kills is decent but conversion rate could be higher given the assist count</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shaunata -->
+  <div class="player-card acc-healer">
+    <div class="card-header"><div><div class="player-name">Shaunata</div><div class="player-role">MAIN HEALER / SHOT CALLER · G3 PUSH OFFENSE</div></div><div class="score-badge score-s">9.6</div></div>
+    <div class="mvp-banner">★  9.11M HEALING · 0 DEATHS · SHOT CALLER · WAR WIN  ★</div>
+    <div class="card-summary">G3 Main Healer and Shot Caller. 9.11M healing with 0 deaths in the hardest war so far is a masterclass performance. Also contributed 5 kills, 490K siege damage, and called the shots for a winning war — while never dying once.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">5</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">44</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,127,509</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">9,114,911</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">490,432</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">9.11M healing — massive output in a much harder war</div>
+        <div class="si-item s">0 deaths — completely untouchable while shot calling</div>
+        <div class="si-item s">490K siege damage — objective awareness even while healing and calling</div>
+        <div class="si-item s">5 kills as a healer/shot caller is remarkable</div>
+        <div class="si-item s">Won the war — shot calling speaks for itself</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">44 assists — could look for more engagement windows when team is stable</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- G4 -->
+  <div class="group-block"><div class="group-header g4"><div><div class="group-name">G4 — PUSH OFFENSE</div><div class="group-desc">StonerGod · Xaomesum (sub for TLB) · Palamecia (sub for SunLujiang) · Gambiteaux · Nyatchi</div></div></div></div>
+
+  <!-- Gambiteaux -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Gambiteaux</div><div class="player-role">DISRUPT DPS · G4 PUSH OFFENSE</div></div><div class="score-badge score-s">9.5</div></div>
+    <div class="mvp-banner">★  87 ASSISTS · 1 DEATH · CONSISTENTLY ELITE  ★</div>
+    <div class="card-summary">G4 Disrupt DPS. 11 kills, 87 assists, only 1 death and 1.25M siege damage — Gambiteaux continues to be one of the most reliable players in the roster across both wars. Strong in every category.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">11</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">87</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,609,413</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">1,250,599</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">87 assists — outstanding team presence</div>
+        <div class="si-item s">Only 1 death in a hard war — elite survivability</div>
+        <div class="si-item s">1.25M siege damage — top siege contributor in G4</div>
+        <div class="si-item s">11 kills — strong offensive output for a disrupt role</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">Nothing significant — consistently strong across both wars</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Xaomesum -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Xaomesum <span class="sub-badge">SUB</span></div><div class="player-role">AOE DPS · G4 PUSH OFFENSE · SUBBED IN FOR TLB</div></div><div class="score-badge score-s">9.2</div></div>
+    <div class="card-summary">G4 AoE DPS sub replacing TLB. 12 kills and 90 assists in a debut push offense performance is excellent. Only 2 deaths shows solid survivability for someone new to this role in a hard war.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">12</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d2">2</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">90</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,030,675</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">380,286</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">12 kills — strong debut in push offense</div>
+        <div class="si-item s">90 assists — immediately integrated into G4 team fights</div>
+        <div class="si-item s">2 deaths — controlled survivability for a new role</div>
+        <div class="si-item s">2.60M damage taken — not shying away from the push</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">Damage output could be higher for an AoE DPS in push offense</div>
+        <div class="si-item i">Siege damage is low — needs to focus more on objective damage during pushes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- StonerGod -->
+  <div class="player-card acc-tank">
+    <div class="card-header"><div><div class="player-name">StonerGod</div><div class="player-role">PEEL TANK · G4 PUSH OFFENSE</div></div><div class="score-badge score-b">7.8</div></div>
+    <div class="card-summary">G4 Peel Tank. 72 assists shows StonerGod was still highly present in fights, but 4 deaths and only 1M damage is a significant step down from the last war where he posted 62 assists with just 1 death. NhatNguyet clearly targeted the tank line.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">3</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d4">4</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">72</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,001,616</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">473,127</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">72 assists — still highly present in fights despite the difficult matchup</div>
+        <div class="si-item s">4.40M damage taken — absorbing enormous pressure for the team</div>
+        <div class="si-item s">473K siege damage — maintained objective focus</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">4 deaths — went from 1 death last war to 4, needs positioning and cooldown review</div>
+        <div class="si-item i">1M damage dealt is very low — was focused on tanking but offensive contribution dropped off</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nyatchi -->
+  <div class="player-card acc-healer">
+    <div class="card-header"><div><div class="player-name">Nyatchi</div><div class="player-role">MAIN HEALER · G4 PUSH OFFENSE</div></div><div class="score-badge score-s">9.3</div></div>
+    <div class="card-summary">G4 Main Healer. 12.14M healing is extraordinary — the 3rd highest in the entire war. With StonerGod taking 4.4M damage, Nyatchi was clearly under enormous pressure and responded brilliantly.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">3</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">50</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">694,391</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">12,139,337</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">194,403</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">12.14M healing — 3rd highest in the war, massive output under pressure</div>
+        <div class="si-item s">Only 1 death despite G4 being heavily targeted</div>
+        <div class="si-item s">50 assists — well integrated with the team</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">Nothing significant — outstanding performance under extremely difficult conditions</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Palamecia -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Palamecia <span class="sub-badge">SUB</span></div><div class="player-role">DPS · G4 PUSH OFFENSE · SUBBED IN FOR SunLujiang</div></div><div class="score-badge score-c">6.5</div></div>
+    <div class="card-summary">G4 DPS sub. 5 deaths is the highest in the entire war and the most concerning individual stat line. Only 3 kills and 1.32M damage in a push offense role while dying the most of anyone is a difficult debut. Palamecia needs significant work before the next war.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">3</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d5">5</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">46</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,322,777</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">410,035</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">46 assists — was engaged in team fights</div>
+        <div class="si-item s">410K siege damage — some objective awareness</div>
+        <div class="si-item s">2.48M damage taken — committed to the push</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">5 deaths — highest in the entire war, critical positioning issue</div>
+        <div class="si-item i">1.32M damage is very low for a push offense DPS role</div>
+        <div class="si-item i">Only 3 kills — needs to convert more engagements</div>
+        <div class="si-item i">Strongly recommend training sessions before next war assignment</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- G5 -->
+  <div class="group-block"><div class="group-header g5"><div><div class="group-name">G5 — CAMP &amp; DAMAGE</div><div class="group-desc">OOO · Jiuangh · Kumo-rui · KoLipTic · CountSnoozy — Unchanged roster</div></div></div></div>
+
+  <!-- OOO -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">OOO</div><div class="player-role">AOE DPS · G5 CAMP &amp; DAMAGE</div></div><div class="score-badge score-s">9.8</div></div>
+    <div class="mvp-banner">★  MVP — 4.81M DAMAGE · 104 ASSISTS · BACK-TO-BACK ELITE WARS  ★</div>
+    <div class="card-summary">G5 AoE DPS. Another extraordinary war from OOO — 4.81M damage, 104 assists, only 1 death. The second-highest damage in the war and one of the highest assist counts. OOO is the most consistent performer in the guild across both wars.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">13</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">104</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">4,808,883</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">444,728</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">4.81M damage — 2nd highest in the entire war</div>
+        <div class="si-item s">104 assists — top 3 in the war</div>
+        <div class="si-item s">Only 1 death in a much harder match</div>
+        <div class="si-item s">Back-to-back elite performances — most consistent player in the guild</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">Nothing to flag — elite performance again</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KoLipTic -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">KoLipTic</div><div class="player-role">AOE DPS · G5 CAMP &amp; DAMAGE</div></div><div class="score-badge score-s">9.1</div></div>
+    <div class="card-summary">G5 AoE DPS. Strong improvement from the last war — 3.35M damage, 94 assists, and only 1 death is a well-rounded showing. The step up in performance reflects growing confidence in the role.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">9</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">94</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">3,345,518</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">986,076</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">3.35M damage — strong improvement from last war</div>
+        <div class="si-item s">94 assists — massive improvement, constantly engaged</div>
+        <div class="si-item s">986K siege damage — excellent objective contribution</div>
+        <div class="si-item s">Only 1 death in a harder war</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">Kill count could be higher given the damage and assist numbers</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kumo-rui -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Kumo-rui</div><div class="player-role">DISRUPT DPS · G5 CAMP &amp; DAMAGE</div></div><div class="score-badge score-a">8.8</div></div>
+    <div class="card-summary">G5 Disrupt DPS. 97 assists and 12 kills shows Kumo-rui was constantly disrupting and converting. Only 2 deaths in a harder war is solid. A strong consistent performance.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">12</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d2">2</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">97</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,982,420</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">457,024</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">97 assists — outstanding team presence</div>
+        <div class="si-item s">12 kills — strong conversion rate for a disrupt role</div>
+        <div class="si-item s">Only 2 deaths in a much harder war</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">Damage output could be higher given 97 assists and 12 kills</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jiuangh -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Jiuangh</div><div class="player-role">AOE DPS · G5 CAMP &amp; DAMAGE</div></div><div class="score-badge score-a">8.0</div></div>
+    <div class="card-summary">G5 AoE DPS. Much improved from last war — 84 assists is a massive jump from 43, and the damage improved too. Still the lowest damage dealer in G5 but the trajectory is positive. Only 1 death is excellent.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">3</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">84</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,668,685</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">775,342</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">84 assists — massive improvement from 43 last war</div>
+        <div class="si-item s">775K siege damage — strong objective contribution</div>
+        <div class="si-item s">Only 1 death — clean survivability</div>
+        <div class="si-item s">Clear improvement trajectory from war to war</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">1.67M damage is still lowest in G5 — needs to push combat damage alongside siege</div>
+        <div class="si-item i">3 kills is low for the assist count — convert more engagements</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CountSnoozy -->
+  <div class="player-card acc-healer">
+    <div class="card-header"><div><div class="player-name">CountSnoozy</div><div class="player-role">MAIN HEALER · G5 CAMP &amp; DAMAGE</div></div><div class="score-badge score-s">9.6</div></div>
+    <div class="mvp-banner">★  #1 HEALING IN THE ENTIRE WAR — 14,663,801  ★</div>
+    <div class="card-summary">G5 Main Healer. 14.66M healing is the highest in the entire war — an absolutely staggering number that kept G5 fully operational through a grueling match. Back-to-back wars as the top healer in the guild.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">1</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">36</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">345,411</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">14,663,801</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">344,888</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">14.66M healing — #1 in the entire war, back-to-back wars leading in healing</div>
+        <div class="si-item s">G5 sustained fully throughout despite the harder opponent</div>
+        <div class="si-item s">2.28M damage taken — stayed close to keep healing range</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">1 death — review that instance, healers should be protected in camp roles</div>
+        <div class="si-item i">36 assists is low — expected for pure healing focus</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- G6 -->
+  <div class="group-block"><div class="group-header g6"><div><div class="group-name">G6 — CAMP &amp; DAMAGE</div><div class="group-desc">spuriousleaf (Halftime Performer) · Arrow · SavageVybz · HunnWieLoe · Tyranhar — Unchanged roster</div></div></div></div>
+
+  <!-- spuriousleaf -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">spuriousleaf</div><div class="player-role">AOE DPS / HALFTIME PERFORMER · G6 CAMP &amp; DAMAGE</div></div><div class="score-badge score-s">9.5</div></div>
+    <div class="mvp-banner">★  HALFTIME PERFORMER · 98 ASSISTS · 3.67M DAMAGE · BACK-TO-BACK  ★</div>
+    <div class="card-summary">G6 AoE DPS and Halftime Performer. 3.67M damage, 98 assists, only 2 deaths — another dominant war. Reduced deaths from 2 (same) but pushed assist count from 56 to 98. Consistently elite.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">11</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d2">2</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">98</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">3,674,054</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">1,001,525</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">3.67M damage — elite output again</div>
+        <div class="si-item s">98 assists — massive improvement from 56 last war</div>
+        <div class="si-item s">1M siege damage — strong objective contribution</div>
+        <div class="si-item s">Halftime duel delivered back-to-back wars</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">2 deaths — same as last war, as halftime performer review both instances to protect that role</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tyranhar -->
+  <div class="player-card acc-healer">
+    <div class="card-header"><div><div class="player-name">Tyranhar</div><div class="player-role">MAIN HEALER · G6 CAMP &amp; DAMAGE</div></div><div class="score-badge score-s">9.5</div></div>
+    <div class="mvp-banner">★  13.06M HEALING · 0 DEATHS · ELITE BACK-TO-BACK  ★</div>
+    <div class="card-summary">G6 Main Healer. 13.06M healing with 0 deaths in the hardest war yet is a phenomenal performance. Up from 7.89M last war while still not dying once — Tyranhar is becoming one of the most reliable healers in the guild.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">7</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">59</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,251,316</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">13,064,154</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">254,366</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">13.06M healing — 2nd highest in the war, massive improvement from last war</div>
+        <div class="si-item s">0 deaths — back-to-back wars without dying</div>
+        <div class="si-item s">7 kills as a healer is remarkable situational awareness</div>
+        <div class="si-item s">Clear upward trajectory — improving every war</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">Nothing significant — elite performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HunnWieLoe -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">HunnWieLoe</div><div class="player-role">DISRUPT DPS · G6 CAMP &amp; DAMAGE</div></div><div class="score-badge score-s">9.2</div></div>
+    <div class="card-summary">G6 Disrupt DPS. Major improvement from last war — 10 kills, 91 assists, only 1 death. HunnWieLoe addressed the low kill issue from last war and delivered a well-rounded performance.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">10</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">91</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,232,100</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">19,434</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">837,670</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">10 kills — massive improvement from 2 kills last war</div>
+        <div class="si-item s">91 assists — top team presence in G6</div>
+        <div class="si-item s">837K siege damage — excellent objective focus</div>
+        <div class="si-item s">Only 1 death — addressed the survivability from last war</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">Damage output could still be pushed higher for a disrupt DPS role</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SavageVybz -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">SavageVybz</div><div class="player-role">AOE DPS · G6 CAMP &amp; DAMAGE</div></div><div class="score-badge score-a">8.5</div></div>
+    <div class="card-summary">G6 AoE DPS. 2.79M damage and 10 kills is solid but 3 deaths is a step back from last war. Siege damage remains strong. A decent showing but survivability needs to return to the previous level.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">10</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d3">3</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">83</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,788,257</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">1,118,572</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">2.79M damage — solid AoE output</div>
+        <div class="si-item s">1.12M siege damage — strong objective focus maintained</div>
+        <div class="si-item s">83 assists — well engaged throughout</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">3 deaths — went from 1 to 3, review positioning in this harder matchup</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Arrow</div><div class="player-role">AOE DPS · G6 CAMP &amp; DAMAGE</div></div><div class="score-badge score-b">7.8</div></div>
+    <div class="card-summary">G6 AoE DPS. 2.97M damage and 1.44M siege damage shows strong contribution but 6 deaths is a serious concern — the 2nd highest death count in the war. Arrow was clearly being targeted or overextending in this match.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">6</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d6">6</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">78</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,973,431</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">1,436,184</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col"><div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">1.44M siege damage — #1 siege damage in the entire war</div>
+        <div class="si-item s">2.97M damage — strong output despite the deaths</div>
+        <div class="si-item s">78 assists — consistently engaged</div>
+      </div>
+      <div class="si-col"><div class="si-title i">IMPROVE</div>
+        <div class="si-item i">6 deaths — 2nd highest in the war and a major step back from 1 death last war</div>
+        <div class="si-item i">Urgently needs positioning and survivability review before next war</div>
+        <div class="si-item i">The siege contribution is excellent but dying 6 times is too costly</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>XS-SHAUNATA · Individual Player Ratings · War vs NhatNguyet · Where Winds Meet Global</p>
+    <p>Ratings based on: War stats · Role expectations · War plan assignments · Roster substitutions noted</p>
+  </div>
+
+</div>
+</body>
+</html>

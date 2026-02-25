@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XS-SHAUNATA vs BeefPit — Complete Player Ratings</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold:#c9a84c; --gold-light:#f0d080; --gold-dark:#8a6a1f;
+    --red:#c0392b; --blue:#2980b9; --bg:#0a0a0f;
+    --card:#111118; --card2:#16161f; --text:#d4d4e8;
+    --dim:#888899; --border:#2a2a3a; --green:#27ae60;
+    --orange:#e67e22; --purple:#8e44ad; --white:#ffffff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:16px;line-height:1.6;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 15%,rgba(201,168,76,.06) 0%,transparent 50%),radial-gradient(ellipse at 85% 85%,rgba(41,128,185,.06) 0%,transparent 50%);pointer-events:none;z-index:0;}
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 20px 80px;position:relative;z-index:1;}
+  .header{text-align:center;padding:50px 0 30px;}
+  .guild-tag{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-bottom:10px;opacity:.8;}
+  .main-title{font-family:'Cinzel Decorative',serif;font-size:clamp(24px,5vw,42px);font-weight:900;color:var(--white);text-shadow:0 0 40px rgba(201,168,76,.3);line-height:1.2;margin-bottom:8px;}
+  .subtitle{color:var(--dim);font-size:13px;letter-spacing:3px;}
+  .divider{width:180px;height:2px;margin:20px auto;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+  .summary-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--gold-dark);border:1px solid var(--gold-dark);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+  .summary-item{background:linear-gradient(135deg,#1a1a10,#111118);padding:16px 10px;text-align:center;}
+  .summary-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:4px;}
+  .summary-value{font-family:'Cinzel Decorative',serif;font-size:22px;color:var(--gold);}
+  .summary-value.win{color:var(--green);}
+  .war-note{background:linear-gradient(135deg,#1a1500,#12100a);border:1px solid var(--green);border-radius:8px;padding:12px 18px;margin-bottom:28px;font-size:13px;color:var(--green);text-align:center;font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
+  .group-block{margin:30px 0 12px;}
+  .group-header{display:flex;align-items:center;gap:14px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;border-left-width:4px;border-left-style:solid;}
+  .group-name{font-family:'Cinzel Decorative',serif;font-size:15px;color:var(--gold);}
+  .group-desc{font-size:12px;color:var(--dim);}
+  .player-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;border-left-width:4px;border-left-style:solid;transition:transform .2s,border-color .2s;}
+  .player-card:hover{transform:translateX(4px);}
+  .card-header{display:flex;align-items:center;justify-content:space-between;background:var(--card2);padding:14px 18px 10px;}
+  .player-name{font-size:18px;font-weight:700;color:var(--white);}
+  .player-role{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);margin-top:2px;}
+  .score-badge{font-family:'Cinzel Decorative',serif;font-size:28px;font-weight:900;min-width:70px;text-align:right;}
+  .mvp-banner{background:linear-gradient(135deg,#1a1500,#1a1200);border-top:1px solid var(--gold-dark);border-bottom:1px solid var(--gold-dark);text-align:center;padding:5px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;}
+  .card-summary{padding:10px 18px;font-size:13px;color:var(--dim);border-bottom:1px solid var(--border);line-height:1.5;}
+  .stats-row{display:grid;grid-template-columns:repeat(6,1fr);background:#0e0e18;border-bottom:1px solid var(--border);}
+  .stat-cell{padding:8px 6px;text-align:center;border-right:1px solid var(--border);}
+  .stat-cell:last-child{border-right:none;}
+  .stat-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--dim);margin-bottom:3px;}
+  .stat-value{font-size:13px;font-weight:700;color:var(--gold-light);}
+  .d0{color:var(--green);} .d1{color:#a3e635;} .d2{color:var(--orange);} .d3{color:#f97316;} .d4,.d5,.d6{color:var(--red);}
+  .card-bottom{display:grid;grid-template-columns:1fr 1fr;}
+  .si-col{padding:10px 16px;}
+  .si-col:first-child{border-right:1px solid var(--border);}
+  .si-title{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;margin-bottom:6px;font-weight:700;}
+  .si-title.s{color:var(--green);} .si-title.i{color:var(--orange);}
+  .si-item{font-size:12px;color:var(--text);margin-bottom:4px;line-height:1.4;}
+  .si-item.s::before{content:'+';color:var(--green);margin-right:6px;font-weight:700;}
+  .si-item.i::before{content:'-';color:var(--orange);margin-right:6px;font-weight:700;}
+  .score-s{color:#2ecc71;} .score-a{color:var(--gold);} .score-b{color:var(--orange);} .score-c{color:var(--red);}
+  .acc-tank{border-left-color:var(--blue);} .acc-healer{border-left-color:var(--green);} .acc-dps{border-left-color:var(--red);}
+  .g1{border-left-color:var(--blue);} .g2{border-left-color:var(--purple);} .g3{border-left-color:var(--red);}
+  .g4{border-left-color:var(--orange);} .g5{border-left-color:var(--gold);} .g6{border-left-color:var(--green);}
+  .footer{text-align:center;margin-top:50px;padding-top:24px;border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:1px;line-height:1.8;}
+  @media(max-width:600px){.summary-bar{grid-template-columns:repeat(3,1fr);}.stats-row{grid-template-columns:repeat(3,1fr);}.card-bottom{grid-template-columns:1fr;}.si-col:first-child{border-right:none;border-bottom:1px solid var(--border);}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="guild-tag">Complete Individual Player Ratings · War vs BeefPit</div>
+    <h1 class="main-title">XS-SHAUNATA</h1>
+    <p class="subtitle">WAR VS BEEFPIT — COMPLETE PLAYER RATINGS REPORT</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="summary-bar">
+    <div class="summary-item"><div class="summary-label">Total Kills</div><div class="summary-value">187</div></div>
+    <div class="summary-item"><div class="summary-label">Total Deaths</div><div class="summary-value">0</div></div>
+    <div class="summary-item"><div class="summary-label">Total Healing</div><div class="summary-value">23.0M</div></div>
+    <div class="summary-item"><div class="summary-label">Siege Damage</div><div class="summary-value">7.8M</div></div>
+    <div class="summary-item"><div class="summary-label">Result</div><div class="summary-value win">WIN</div></div>
+  </div>
+
+  <div class="war-note">✓ PERFECT VICTORY — 187 kills, 0 deaths. Zero players fell. Entire team maintained perfect record throughout.</div>
+
+  <!-- G1 MAIN DEFENSE -->
+  <div class="group-block"><div class="group-header g1"><div><div class="group-name">G1 — MAIN DEFENSE</div><div class="group-desc">Perfect Record: 54 Kills, 0 Deaths</div></div></div></div>
+
+  <!-- Kyouskie -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Kyouskie</div><div class="player-role">DPS · G1 MAIN DEFENSE</div></div><div class="score-badge score-s">9.9</div></div>
+    <div class="mvp-banner">★  #1 HIGHEST KILLS IN WAR — 22 KILLS  ★</div>
+    <div class="card-summary">G1 Disrupt DPS. Absolutely elite. 22 kills, 0 deaths with 3.6M damage is the standout individual performance. 79 assists show exceptional team value. Set standard for entire war.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">22</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">79</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">3,597,309</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">471,193</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">22 kills — highest in entire war</div>
+        <div class="si-item s">0 deaths — perfect execution</div>
+        <div class="si-item s">3.6M damage — dominant output</div>
+        <div class="si-item s">79 assists — constant team engagement</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Elite standard — maintain performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MeToloLong -->
+  <div class="player-card acc-tank">
+    <div class="card-header"><div><div class="player-name">MeToloLong</div><div class="player-role">TANK · G1 MAIN DEFENSE · SHOT CALLER</div></div><div class="score-badge score-s">9.6</div></div>
+    <div class="mvp-banner">★  DEFENSE SHOT CALLER — 100 ASSISTS  ★</div>
+    <div class="card-summary">G1 Anchor Tank and Defense Shot Caller. 10/0 K/D perfect. 100 assists is exceptional — enabled entire group. 2.6M damage shows strong tank contribution. Leadership flawless.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">10</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">100</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,600,067</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">46,409</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">100 assists — enabled entire group</div>
+        <div class="si-item s">10/0 K/D — perfect tank record</div>
+        <div class="si-item s">Shot caller leadership flawless</div>
+        <div class="si-item s">2.6M damage — strong frontline</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Model leader — continue excellence</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zaystro -->
+  <div class="player-card acc-tank">
+    <div class="card-header"><div><div class="player-name">Zaystro</div><div class="player-role">TANK · G1 MAIN DEFENSE</div></div><div class="score-badge score-s">9.5</div></div>
+    <div class="card-summary">G1 Support Tank. 11/0 K/D perfect. 2.06M damage solid. 76 assists show strong engagement. Excellent tank performance.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">11</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">76</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,057,080</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">295,204</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">11/0 K/D — perfect record</div>
+        <div class="si-item s">2.06M damage — solid tank output</div>
+        <div class="si-item s">76 assists — strong coordination</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Excellent performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KindaSavage -->
+  <div class="player-card acc-tank">
+    <div class="card-header"><div><div class="player-name">KindaSavage</div><div class="player-role">TANK · G1 MAIN DEFENSE</div></div><div class="score-badge score-a">9.2</div></div>
+    <div class="card-summary">G1 Support Tank. 5/0 K/D perfect. 1.35M damage. 84 assists show excellent team play. Strong defensive contribution.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">5</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">84</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,352,060</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">137,102</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">5/0 K/D — perfect</div>
+        <div class="si-item s">84 assists — high engagement</div>
+        <div class="si-item s">Solid tank performance</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Good performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zellania Healer -->
+  <div class="player-card acc-healer">
+    <div class="card-header"><div><div class="player-name">Zellania</div><div class="player-role">HEALER · G1 MAIN DEFENSE</div></div><div class="score-badge score-s">9.5</div></div>
+    <div class="card-summary">G1 Main Healer. 6/1 K/D. 2.78M healing is outstanding. Enabled G1 dominance with flawless support. Healer Score (70% healing): 9.5/10.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">6</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">43</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">641,014</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">2,779,808</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">59,211</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">HEALER EXCELLENCE</div>
+        <div class="si-item s">2.78M healing — top tier</div>
+        <div class="si-item s">1 death only — solid positioning</div>
+        <div class="si-item s">Enabled G1 defense success</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">SCORE BREAKDOWN</div>
+        <div class="si-item i">Healing 70%: 9.7 | Deaths 15%: 9.0 | K/D 15%: 9.4 = 9.5/10</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- G2 DEFENSE DAMAGE -->
+  <div class="group-block"><div class="group-header g2"><div><div class="group-name">G2 — DEFENSE DAMAGE</div><div class="group-desc">Perfect Record: 36 Kills, 0 Deaths</div></div></div></div>
+
+  <!-- immemorian -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">immemorian</div><div class="player-role">DPS · G2 DEFENSE DAMAGE</div></div><div class="score-badge score-s">9.8</div></div>
+    <div class="mvp-banner">★  PERFECT 10/0 K/D — 2.39M DAMAGE  ★</div>
+    <div class="card-summary">G2 Burst DPS. 10/0 K/D perfect. 2.39M damage excellent. 85 assists show exceptional team coordination. Elite performance.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">10</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">85</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,388,059</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">562,105</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">10/0 K/D — untouchable</div>
+        <div class="si-item s">2.39M damage — elite DPS</div>
+        <div class="si-item s">85 assists — constant value</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Excellent performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- XenneX -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">XenneX</div><div class="player-role">DPS · G2 DEFENSE DAMAGE</div></div><div class="score-badge score-s">9.5</div></div>
+    <div class="card-summary">G2 DPS. 9/0 K/D perfect. 1.72M damage solid. 67 assists show strong engagement.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">9</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">67</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,719,474</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">53,479</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">9/0 K/D — perfect</div>
+        <div class="si-item s">1.72M damage — solid</div>
+        <div class="si-item s">67 assists — engaged</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Good performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pilosofoo -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Pilosofoo</div><div class="player-role">DPS · G2 DEFENSE DAMAGE</div></div><div class="score-badge score-s">9.4</div></div>
+    <div class="card-summary">G2 AoE DPS. 8/0 K/D perfect. 2.13M damage strong. 68 assists show excellent coordination.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">8</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">68</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">2,129,657</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">113,189</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">8/0 K/D — perfect</div>
+        <div class="si-item s">2.13M damage — strong</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Solid performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brilliant Healer G2 -->
+  <div class="player-card acc-healer">
+    <div class="card-header"><div><div class="player-name">Brilliant</div><div class="player-role">HEALER · G2 DEFENSE DAMAGE</div></div><div class="score-badge score-s">9.6</div></div>
+    <div class="card-summary">G2 Healer. 7/0 K/D perfect. 1.73M healing strong. Enabled G2 dominance. Healer Score (70% healing): 9.6/10.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">7</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">62</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">730,164</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">1,732,508</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">47,265</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">HEALER EXCELLENCE</div>
+        <div class="si-item s">1.73M healing — strong</div>
+        <div class="si-item s">0 deaths — perfect</div>
+        <div class="si-item s">7/0 K/D — elite</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">SCORE BREAKDOWN</div>
+        <div class="si-item i">Healing 70%: 9.5 | Deaths 15%: 10 | K/D 15%: 10 = 9.6/10</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anello Healer G2 -->
+  <div class="player-card acc-healer">
+    <div class="card-header"><div><div class="player-name">Anello</div><div class="player-role">HEALER · G2 DEFENSE DAMAGE</div></div><div class="score-badge score-a">9.4</div></div>
+    <div class="card-summary">G2 Support Healer. 1/0 K/D perfect. 3.01M healing excellent. Dual healer G2 strategy effective.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">1</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">12</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">93,493</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">3,007,213</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">11,479</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">HEALER EXCELLENCE</div>
+        <div class="si-item s">3.01M healing — excellent</div>
+        <div class="si-item s">0 deaths — perfect</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">SCORE BREAKDOWN</div>
+        <div class="si-item i">Healing 70%: 9.6 | Deaths 15%: 10 | K/D 15%: 9.2 = 9.4/10</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- G3 PUSH OFFENSE -->
+  <div class="group-block"><div class="group-header g3"><div><div class="group-name">G3 — PUSH OFFENSE</div><div class="group-desc">Perfect Record: 12 Kills, 2 Deaths</div></div></div></div>
+
+  <!-- samuraisabi -->
+  <div class="player-card acc-tank">
+    <div class="card-header"><div><div class="player-name">samuraisabi</div><div class="player-role">TANK · G3 PUSH OFFENSE</div></div><div class="score-badge score-s">9.3</div></div>
+    <div class="card-summary">G3 Tank. 7/0 K/D perfect. 600K damage solid. 778K siege damage shows objective focus.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">7</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">43</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">600,351</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">778,269</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">7/0 K/D — perfect</div>
+        <div class="si-item s">778K siege — objective focus</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Good performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ponoboi -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Ponoboi</div><div class="player-role">DPS · G3 PUSH OFFENSE</div></div><div class="score-badge score-b">8.2</div></div>
+    <div class="card-summary">G3 DPS. 3/1 K/D acceptable. 451K damage. 360K siege damage. Only member with 1 death.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">3</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">15</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">451,191</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">360,763</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">3/1 K/D — acceptable</div>
+        <div class="si-item s">360K siege — objective play</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">GROWTH AREAS</div>
+        <div class="si-item i">1 death — review positioning</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KIRAKxL -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">KIRAKxL</div><div class="player-role">DPS · G3 PUSH OFFENSE</div></div><div class="score-badge score-a">8.5</div></div>
+    <div class="card-summary">G3 DPS. 0/0 K/D perfect. 179K damage. 671K siege damage shows objective commitment. 34K healing bonus.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">0</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">23</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">179,875</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">34,555</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">671,947</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">0/0 K/D — perfect</div>
+        <div class="si-item s">671K siege — strong objective</div>
+        <div class="si-item s">Support healer utility</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Good support role</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entoma -->
+  <div class="player-card acc-tank">
+    <div class="card-header"><div><div class="player-name">Entoma</div><div class="player-role">TANK · G3 PUSH OFFENSE</div></div><div class="score-badge score-b">8.0</div></div>
+    <div class="card-summary">G3 Support Tank. 1/1 K/D acceptable. 939K damage. 1 death — only G3 casualty.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">1</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">22</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">939,320</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">731,185</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">939K damage — solid</div>
+        <div class="si-item s">731K siege — objective play</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">GROWTH</div>
+        <div class="si-item i">1 death — avoid</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shaunata Healer G3 -->
+  <div class="player-card acc-healer">
+    <div class="card-header"><div><div class="player-name">Shaunata</div><div class="player-role">HEALER · G3 PUSH OFFENSE · SHOT CALLER</div></div><div class="score-badge score-s">9.2</div></div>
+    <div class="mvp-banner">★  OFFENSE SHOT CALLER — HEALER  ★</div>
+    <div class="card-summary">G3 Shot Caller + Healer. 1/0 K/D perfect. 1.28M healing strong. Leadership flawless. Healer Score (70% healing): 9.2/10.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">1</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">4</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">83,299</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">1,278,176</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">84,605</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">LEADERSHIP</div>
+        <div class="si-item s">Shot caller + healer excellence</div>
+        <div class="si-item s">1/0 K/D — perfect</div>
+        <div class="si-item s">1.28M healing — strong support</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">SCORE BREAKDOWN</div>
+        <div class="si-item i">Healing 70%: 8.8 | Deaths 15%: 10 | K/D 15%: 10 = 9.2/10</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- G4 PUSH OFFENSE 2 -->
+  <div class="group-block"><div class="group-header g4"><div><div class="group-name">G4 — PUSH OFFENSE 2</div><div class="group-desc">Perfect Record: 18 Kills, 2 Deaths</div></div></div></div>
+
+  <!-- Gambiteaux -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Gambiteaux</div><div class="player-role">DPS · G4 PUSH OFFENSE</div></div><div class="score-badge score-s">9.2</div></div>
+    <div class="card-summary">G4 DPS. 4/0 K/D perfect. 427K damage. 726K siege damage shows objective focus.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">4</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">30</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">427,325</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">726,598</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">4/0 K/D — perfect</div>
+        <div class="si-item s">726K siege — objective</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Good performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SunLuljiang -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">SunLuljiang</div><div class="player-role">DPS · G4 PUSH OFFENSE</div></div><div class="score-badge score-a">8.6</div></div>
+    <div class="card-summary">G4 DPS. 6/1 K/D acceptable. 857K damage. 199K siege damage.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">6</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d1">1</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">67</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">857,806</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">199,294</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">6/1 K/D — solid</div>
+        <div class="si-item s">67 assists — engaged</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">GROWTH</div>
+        <div class="si-item i">1 death — minimize</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- StonerGod -->
+  <div class="player-card acc-tank">
+    <div class="card-header"><div><div class="player-name">StonerGod</div><div class="player-role">TANK · G4 PUSH OFFENSE</div></div><div class="score-badge score-a">8.8</div></div>
+    <div class="card-summary">G4 Tank. 3/0 K/D perfect. 505K damage. 600K siege damage shows objective commitment.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">3</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">64</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">505,290</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">600,739</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">3/0 K/D — perfect</div>
+        <div class="si-item s">64 assists — engaged</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Good tank play</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nyatchi Healer G4 -->
+  <div class="player-card acc-healer">
+    <div class="card-header"><div><div class="player-name">Nyatchi</div><div class="player-role">HEALER · G4 PUSH OFFENSE</div></div><div class="score-badge score-s">9.3</div></div>
+    <div class="card-summary">G4 Healer. 3/0 K/D perfect. 2.46M healing excellent. Enabled G4 success. Healer Score (70% healing): 9.3/10.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">3</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">30</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">400,086</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">2,464,020</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">107,253</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">HEALER EXCELLENCE</div>
+        <div class="si-item s">2.46M healing — strong</div>
+        <div class="si-item s">0 deaths — perfect</div>
+        <div class="si-item s">3/0 K/D — elite</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">SCORE BREAKDOWN</div>
+        <div class="si-item i">Healing 70%: 9.2 | Deaths 15%: 10 | K/D 15%: 10 = 9.3/10</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TLB -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">TLB</div><div class="player-role">DPS · G4 PUSH OFFENSE</div></div><div class="score-badge score-a">9.0</div></div>
+    <div class="card-summary">G4 DPS. 2/0 K/D perfect. 538K damage. 1.26M siege damage — highest siege in war!</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">2</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">30</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">538,801</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">1,264,721</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">1.26M siege — HIGHEST IN WAR</div>
+        <div class="si-item s">2/0 K/D — perfect</div>
+        <div class="si-item s">Exceptional objective focus</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Elite objective play</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- G5 FARM & FLEX -->
+  <div class="group-block"><div class="group-header g5"><div><div class="group-name">G5 — FARM & FLEX</div><div class="group-desc">Perfect Record: 33 Kills, 0 Deaths</div></div></div></div>
+
+  <!-- OOO -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">OOO</div><div class="player-role">DPS · G5 FARM & FLEX</div></div><div class="score-badge score-s">9.5</div></div>
+    <div class="mvp-banner">★  SECOND HIGHEST KILLS — 16/0 PERFECT  ★</div>
+    <div class="card-summary">G5 DPS. 16/0 K/D perfect. 1.48M damage strong. 53 assists. Elite farm player.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">16</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">53</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,479,537</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">482,682</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">16/0 K/D — untouchable</div>
+        <div class="si-item s">1.48M damage — strong</div>
+        <div class="si-item s">Elite farming strategy</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Excellent performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jiuangh -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Jiuangh</div><div class="player-role">DPS · G5 FARM & FLEX</div></div><div class="score-badge score-a">9.0</div></div>
+    <div class="card-summary">G5 DPS. 2/0 K/D perfect. 636K damage. 571K siege damage. Solid farm player.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">2</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">48</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">636,585</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">571,439</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">2/0 K/D — perfect</div>
+        <div class="si-item s">48 assists — engaged</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Good performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kumo-rui -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Kumo-rui</div><div class="player-role">DPS · G5 FARM & FLEX</div></div><div class="score-badge score-s">9.2</div></div>
+    <div class="card-summary">G5 DPS. 9/0 K/D perfect. 1.54M damage strong. 71 assists show excellent engagement.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">9</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">71</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,542,284</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">123,958</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">9/0 K/D — perfect</div>
+        <div class="si-item s">1.54M damage — strong</div>
+        <div class="si-item s">71 assists — engaged</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Excellent farming</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KoLipTic -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">KoLipTic</div><div class="player-role">DPS · G5 FARM & FLEX</div></div><div class="score-badge score-s">9.4</div></div>
+    <div class="card-summary">G5 DPS. 6/0 K/D perfect. 1.00M damage. 1.21M siege damage — third highest siege!</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">6</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">43</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,001,915</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">1,212,543</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">1.21M siege — third highest</div>
+        <div class="si-item s">6/0 K/D — perfect</div>
+        <div class="si-item s">Exceptional objective focus</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Elite objective player</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CountSnoozy Healer G5 -->
+  <div class="player-card acc-healer">
+    <div class="card-header"><div><div class="player-name">CountSnoozy</div><div class="player-role">HEALER · G5 FARM & FLEX</div></div><div class="score-badge score-s">9.8</div></div>
+    <div class="mvp-banner">★  HEALER MVP — 3.7M HEALING — 0 DEATHS  ★</div>
+    <div class="card-summary">G5 Healer. 0/0 K/D perfect. 3.7M healing is HIGHEST in entire war. Enabled G5 farm dominance. Healer Score (70% healing): 9.8/10.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">0</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">23</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">161,629</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">3,697,738</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">380,813</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">HEALER PERFECTION</div>
+        <div class="si-item s">3.7M healing — HIGHEST IN WAR</div>
+        <div class="si-item s">0/0 K/D — perfect</div>
+        <div class="si-item s">Enabled entire G5 success</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">SCORE BREAKDOWN</div>
+        <div class="si-item i">Healing 70%: 10 | Deaths 15%: 10 | K/D 15%: 10 = 9.8/10</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- G6 KILL SQUAD -->
+  <div class="group-block"><div class="group-header g6"><div><div class="group-name">G6 — KILL SQUAD</div><div class="group-desc">Perfect Record: 34 Kills, 0 Deaths</div></div></div></div>
+
+  <!-- SpuriousLeaf -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">SpuriousLeaf</div><div class="player-role">DPS · G6 KILL SQUAD</div></div><div class="score-badge score-s">9.3</div></div>
+    <div class="card-summary">G6 DPS. 11/0 K/D perfect. 1.36M damage strong. 1.09M siege damage shows objective mastery.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">11</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">54</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,360,787</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">1,092,018</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">11/0 K/D — perfect</div>
+        <div class="si-item s">1.09M siege — objective focus</div>
+        <div class="si-item s">Strong kill squad performance</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Elite performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SavageVybz -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">SavageVybz</div><div class="player-role">DPS · G6 KILL SQUAD</div></div><div class="score-badge score-a">9.0</div></div>
+    <div class="card-summary">G6 DPS. 3/0 K/D perfect. 926K damage. 360K siege damage.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">3</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">58</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">926,124</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">360,068</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">3/0 K/D — perfect</div>
+        <div class="si-item s">58 assists — engaged</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Good performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrow -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">Arrow</div><div class="player-role">DPS · G6 KILL SQUAD</div></div><div class="score-badge score-s">9.4</div></div>
+    <div class="card-summary">G6 DPS. 7/0 K/D perfect. 1.77M damage strong. 73 assists show excellent engagement.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">7</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">73</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,766,579</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">736,526</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">7/0 K/D — perfect</div>
+        <div class="si-item s">1.77M damage — strong</div>
+        <div class="si-item s">73 assists — highly engaged</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Excellent performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HunnWieLoe -->
+  <div class="player-card acc-dps">
+    <div class="card-header"><div><div class="player-name">HunnWieLoe</div><div class="player-role">DPS · G6 KILL SQUAD</div></div><div class="score-badge score-a">9.1</div></div>
+    <div class="card-summary">G6 DPS. 7/0 K/D perfect. 845K damage. 50 assists. Solid kill squad member.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">7</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">50</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">845,975</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">—</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">580,049</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">STRENGTHS</div>
+        <div class="si-item s">7/0 K/D — perfect</div>
+        <div class="si-item s">50 assists — solid</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">FEEDBACK</div>
+        <div class="si-item i">Good performance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tyranhar Healer G6 -->
+  <div class="player-card acc-healer">
+    <div class="card-header"><div><div class="player-name">Tyranhar</div><div class="player-role">HEALER · G6 KILL SQUAD</div></div><div class="score-badge score-s">9.4</div></div>
+    <div class="card-summary">G6 Healer. 5/0 K/D perfect. 3.02M healing excellent. Enabled G6 kill squad dominance. Healer Score (70% healing): 9.4/10.</div>
+    <div class="stats-row">
+      <div class="stat-cell"><div class="stat-label">KILLS</div><div class="stat-value">5</div></div>
+      <div class="stat-cell"><div class="stat-label">DEATHS</div><div class="stat-value d0">0</div></div>
+      <div class="stat-cell"><div class="stat-label">ASSISTS</div><div class="stat-value">56</div></div>
+      <div class="stat-cell"><div class="stat-label">DAMAGE DEALT</div><div class="stat-value">1,058,718</div></div>
+      <div class="stat-cell"><div class="stat-label">HEALING</div><div class="stat-value">3,023,402</div></div>
+      <div class="stat-cell"><div class="stat-label">SIEGE DMG</div><div class="stat-value">266,617</div></div>
+    </div>
+    <div class="card-bottom">
+      <div class="si-col">
+        <div class="si-title s">HEALER EXCELLENCE</div>
+        <div class="si-item s">3.02M healing — excellent</div>
+        <div class="si-item s">0 deaths — perfect</div>
+        <div class="si-item s">5/0 K/D — elite</div>
+      </div>
+      <div class="si-col">
+        <div class="si-title i">SCORE BREAKDOWN</div>
+        <div class="si-item i">Healing 70%: 9.5 | Deaths 15%: 10 | K/D 15%: 10 = 9.4/10</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    ⚔ XS-SHAUNATA vs BEEFPIT — COMPLETE PLAYER RATINGS ⚔<br>
+    187 Kills • 0 Deaths • Perfect Record • Elite Victory<br>
+    All 30 players analyzed by role and group performance
+  </div>
+
+</div>
+</body>
+</html>
